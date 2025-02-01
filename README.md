@@ -1,1 +1,1 @@
-# innomatics-internship-task-1
+# InnomaticsInternshipTask-1
