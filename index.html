@@ -6,7 +6,6 @@
     <title>Personal Budget Tracker</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <!-- Include Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         :root {
@@ -26,7 +25,7 @@
             padding: 0;
             background-color: var(--bg-dark);
             color: var(--text-dark);
-            transition: all 0.4s ease-in-out;
+            transition: background-color 0.4s ease, color 0.4s ease;
         }
 
         .container {
@@ -51,7 +50,7 @@
         }
 
         input, select, textarea {
-            width: 98%;
+            width: 100%;
             padding: 14px;
             margin: 10px 0;
             border: none;
@@ -68,6 +67,7 @@
             justify-content: center;
             gap: 15px;
             margin-top: 15px;
+            flex-wrap: wrap;
         }
 
         .btn-group button {
@@ -79,6 +79,7 @@
             cursor: pointer;
             transition: 0.3s;
             width: 45%;
+            margin-bottom: 10px;
         }
 
         .btn-income {
@@ -132,7 +133,6 @@
             cursor: pointer;
         }
 
-        /* Switch Mode Button */
         .switch-mode-btn {
             position: fixed;
             top: 20px;
@@ -151,35 +151,50 @@
         .switch-mode-btn i {
             font-size: 20px;
         }
+
+        .form-section {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .btn-group button {
+                width: 100%;
+            }
+
+            table {
+                font-size: 14px;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- Switch Mode Button with FontAwesome Icon -->
     <button class="switch-mode-btn" onclick="toggleMode()">
-        <i class="fas fa-sun"></i> <!-- Sun icon for Light mode -->
+        <i class="fas fa-sun"></i>
     </button>
 
     <div class="container">
         <div class="card">
             <h2>Personal Budget Tracker</h2>
+            <div class="btn-group">
+                <button class="btn-income" onclick="showForm('Income')">Income</button>
+                <button class="btn-expense" onclick="showForm('Expense')">Expense</button>
+            </div>
         </div>
 
-        <div class="card">
-            <h2>Add Income/Expense</h2>
-            <form id="budgetForm">
+        <div class="card form-section" id="incomeForm">
+            <h2>Add Income</h2>
+            <form id="incomeFormFields">
                 <input type="hidden" id="editIndex" value="-1">
-                
-                <label for="amount">Amount ($):</label>
-                <input type="number" id="amount" required>
+                <label for="incomeAmount">Amount ($):</label>
+                <input type="number" id="incomeAmount" required>
 
-                <label for="category">Category:</label>
-                <select id="category" required>
-                    <option value="Food">Food</option>
-                    <option value="Transportation">Transportation</option>
-                    <option value="Entertainment">Entertainment</option>
-                    <option value="Utilities">Utilities</option>
-                    <option value="Shopping">Shopping</option>
+                <label for="incomeCategory">Category:</label>
+                <select id="incomeCategory" required>
                     <option value="Salary">Salary</option>
                     <option value="Trading">Trading</option>
                     <option value="Freelancing">Freelancing</option>
@@ -188,22 +203,53 @@
                     <option value="Other">Other</option>
                 </select>
 
-                <label for="payment">Payment Method:</label>
-                <select id="payment" required>
+                <label for="incomePayment">Payment Method:</label>
+                <select id="incomePayment" required>
                     <option value="Cash">Cash</option>
                     <option value="Credit Card">Credit Card</option>
                     <option value="UPI">UPI</option>
                     <option value="Bank Transfer">Bank Transfer</option>
                 </select>
 
-                <label for="date">Date:</label>
-                <input type="date" id="date" required>
-
-                <!-- Removed the Tags and Description fields -->
+                <label for="incomeDate">Date:</label>
+                <input type="date" id="incomeDate" required>
 
                 <div class="btn-group">
-                    <button type="button" class="btn-income" onclick="addOrUpdateTransaction('Income')">Income</button>
-                    <button type="button" class="btn-expense" onclick="addOrUpdateTransaction('Expense')">Expense</button>
+                    <button type="button" class="btn-income" onclick="addOrUpdateTransaction('Income')">Add Income</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card form-section" id="expenseForm">
+            <h2>Add Expense</h2>
+            <form id="expenseFormFields">
+                <input type="hidden" id="editIndex" value="-1">
+                <label for="expenseAmount">Amount ($):</label>
+                <input type="number" id="expenseAmount" required>
+
+                <label for="expenseCategory">Category:</label>
+                <select id="expenseCategory" required>
+                    <option value="Food">Food</option>
+                    <option value="Transportation">Transportation</option>
+                    <option value="Entertainment">Entertainment</option>
+                    <option value="Utilities">Utilities</option>
+                    <option value="Shopping">Shopping</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <label for="expensePayment">Payment Method:</label>
+                <select id="expensePayment" required>
+                    <option value="Cash">Cash</option>
+                    <option value="Credit Card">Credit Card</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                </select>
+
+                <label for="expenseDate">Date:</label>
+                <input type="date" id="expenseDate" required>
+
+                <div class="btn-group">
+                    <button type="button" class="btn-expense" onclick="addOrUpdateTransaction('Expense')">Add Expense</button>
                 </div>
             </form>
         </div>
@@ -215,13 +261,14 @@
                     <tr>
                         <th>Category</th>
                         <th>Amount ($)</th>
-                        <th>Payment</th>
+                        <th>Payment Method</th>
                         <th>Date</th>
-                        <th>Type</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody id="summaryTableBody"></tbody>
+                <tbody id="transactionTable">
+                    <!-- Transactions will be listed here -->
+                </tbody>
             </table>
         </div>
     </div>
@@ -229,81 +276,104 @@
     <script>
         let transactions = [];
 
-        function addOrUpdateTransaction(type) {
-            let index = document.getElementById("editIndex").value;
-            let amount = document.getElementById("amount").value;
-            let category = document.getElementById("category").value;
-            let payment = document.getElementById("payment").value;
-            let date = document.getElementById("date").value;
-
-            if (index === "-1") {
-                transactions.push({ amount, category, payment, date, type });
-            } else {
-                transactions[index] = { amount, category, payment, date, type };
-                document.getElementById("editIndex").value = "-1";
-            }
-
-            renderTable();
-            document.getElementById("budgetForm").reset();
+        function toggleMode() {
+            document.body.classList.toggle('light-mode');
+            document.body.style.backgroundColor = document.body.classList.contains('light-mode') ? 'var(--bg-light)' : 'var(--bg-dark)';
+            document.body.style.color = document.body.classList.contains('light-mode') ? 'var(--text-light)' : 'var(--text-dark)';
         }
 
-        function renderTable() {
-            let table = document.getElementById("summaryTableBody");
-            table.innerHTML = "";
+        function showForm(type) {
+            document.getElementById('incomeForm').style.display = type === 'Income' ? 'block' : 'none';
+            document.getElementById('expenseForm').style.display = type === 'Expense' ? 'block' : 'none';
+        }
+
+        function addOrUpdateTransaction(type) {
+            const editIndex = document.getElementById('editIndex').value;
+            let amount, category, payment, date;
+
+            if (type === 'Income') {
+                amount = document.getElementById('incomeAmount').value;
+                category = document.getElementById('incomeCategory').value;
+                payment = document.getElementById('incomePayment').value;
+                date = document.getElementById('incomeDate').value;
+            } else {
+                amount = document.getElementById('expenseAmount').value;
+                category = document.getElementById('expenseCategory').value;
+                payment = document.getElementById('expensePayment').value;
+                date = document.getElementById('expenseDate').value;
+            }
+
+            if (amount && category && payment && date) {
+                if (editIndex === "-1") {
+                    const newTransaction = { type, amount, category, payment, date };
+                    transactions.push(newTransaction);
+                } else {
+                    transactions[editIndex] = { type, amount, category, payment, date };
+                    document.getElementById('editIndex').value = "-1";
+                }
+
+                updateTransactionTable();
+                clearFormFields();
+            } else {
+                alert("Please fill in all fields.");
+            }
+        }
+
+        function updateTransactionTable() {
+            const transactionTable = document.getElementById('transactionTable');
+            transactionTable.innerHTML = '';
 
             transactions.forEach((transaction, index) => {
-                let row = table.insertRow();
-                row.insertCell(0).textContent = transaction.category;
-                row.insertCell(1).textContent = `$${transaction.amount}`;
-                row.insertCell(2).textContent = transaction.payment;
-                row.insertCell(3).textContent = transaction.date;
-                row.insertCell(4).textContent = transaction.type;
-
-                let actionCell = row.insertCell(5);
-                actionCell.innerHTML = `
-                    <button class="edit-btn" onclick="editTransaction(${index})">Edit</button>
-                    <button class="delete-btn" onclick="deleteTransaction(${index})">Delete</button>
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${transaction.category}</td>
+                    <td>${transaction.amount}</td>
+                    <td>${transaction.payment}</td>
+                    <td>${transaction.date}</td>
+                    <td>
+                        <button class="edit-btn" onclick="editTransaction(${index})">Edit</button>
+                        <button class="delete-btn" onclick="deleteTransaction(${index})">Delete</button>
+                    </td>
                 `;
+                transactionTable.appendChild(row);
             });
         }
 
         function editTransaction(index) {
-            let transaction = transactions[index];
-            document.getElementById("amount").value = transaction.amount;
-            document.getElementById("category").value = transaction.category;
-            document.getElementById("payment").value = transaction.payment;
-            document.getElementById("date").value = transaction.date;
-            document.getElementById("editIndex").value = index;
+            const transaction = transactions[index];
+            document.getElementById('editIndex').value = index;
+
+            if (transaction.type === 'Income') {
+                showForm('Income');
+                document.getElementById('incomeAmount').value = transaction.amount;
+                document.getElementById('incomeCategory').value = transaction.category;
+                document.getElementById('incomePayment').value = transaction.payment;
+                document.getElementById('incomeDate').value = transaction.date;
+            } else {
+                showForm('Expense');
+                document.getElementById('expenseAmount').value = transaction.amount;
+                document.getElementById('expenseCategory').value = transaction.category;
+                document.getElementById('expensePayment').value = transaction.payment;
+                document.getElementById('expenseDate').value = transaction.date;
+            }
         }
 
         function deleteTransaction(index) {
             transactions.splice(index, 1);
-            renderTable();
+            updateTransactionTable();
         }
 
-        // Switch Mode Functionality
-        function toggleMode() {
-            let currentMode = document.body.style.backgroundColor;
-            if (currentMode === "rgb(18, 18, 18)") { // Dark mode
-                document.body.style.backgroundColor = "#f4f4f4"; // Light mode
-                document.body.style.color = "#333333";
-                document.querySelectorAll('.card').forEach(card => {
-                    card.style.backgroundColor = "#ffffff";
-                    card.style.boxShadow = "8px 8px 20px rgba(0, 0, 0, 0.1)";
-                });
-                document.querySelector('.switch-mode-btn').innerHTML = `<i class="fas fa-moon"></i>`;
-            } else {
-                document.body.style.backgroundColor = "#121212"; // Dark mode
-                document.body.style.color = "#e0e0e0";
-                document.querySelectorAll('.card').forEach(card => {
-                    card.style.backgroundColor = "#1e1e1e";
-                    card.style.boxShadow = "8px 8px 20px rgba(0, 0, 0, 0.4)";
-                });
-                document.querySelector('.switch-mode-btn').innerHTML = `<i class="fas fa-sun"></i>`;
-            }
+        function clearFormFields() {
+            document.getElementById('incomeAmount').value = '';
+            document.getElementById('incomeCategory').value = '';
+            document.getElementById('incomePayment').value = '';
+            document.getElementById('incomeDate').value = '';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseCategory').value = '';
+            document.getElementById('expensePayment').value = '';
+            document.getElementById('expenseDate').value = '';
         }
     </script>
 
 </body>
 </html>
-
