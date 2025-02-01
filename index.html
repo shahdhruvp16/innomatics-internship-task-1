@@ -168,6 +168,10 @@
             .container {
                 padding: 10px;
             }
+
+            .btn-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -277,9 +281,9 @@
         let transactions = [];
 
         function toggleMode() {
-            document.body.classList.toggle('light-mode');
-            document.body.style.backgroundColor = document.body.classList.contains('light-mode') ? 'var(--bg-light)' : 'var(--bg-dark)';
-            document.body.style.color = document.body.classList.contains('light-mode') ? 'var(--text-light)' : 'var(--text-dark)';
+            const currentMode = document.body.style.backgroundColor === 'rgb(18, 18, 18)' ? 'dark' : 'light';
+            document.body.style.backgroundColor = currentMode === 'dark' ? '#f4f4f4' : '#121212';
+            document.body.style.color = currentMode === 'dark' ? '#333' : '#e0e0e0';
         }
 
         function showForm(type) {
@@ -288,40 +292,68 @@
         }
 
         function addOrUpdateTransaction(type) {
-            const editIndex = document.getElementById('editIndex').value;
-            let amount, category, payment, date;
+            const amount = type === 'Income' ? document.getElementById('incomeAmount').value : document.getElementById('expenseAmount').value;
+            const category = type === 'Income' ? document.getElementById('incomeCategory').value : document.getElementById('expenseCategory').value;
+            const payment = type === 'Income' ? document.getElementById('incomePayment').value : document.getElementById('expensePayment').value;
+            const date = type === 'Income' ? document.getElementById('incomeDate').value : document.getElementById('expenseDate').value;
 
-            if (type === 'Income') {
-                amount = document.getElementById('incomeAmount').value;
-                category = document.getElementById('incomeCategory').value;
-                payment = document.getElementById('incomePayment').value;
-                date = document.getElementById('incomeDate').value;
+            const transaction = {
+                amount: parseFloat(amount),
+                category: category,
+                payment: payment,
+                date: date,
+                type: type
+            };
+
+            if (document.getElementById('editIndex').value !== '-1') {
+                transactions[document.getElementById('editIndex').value] = transaction;
+                document.getElementById('editIndex').value = '-1';
             } else {
-                amount = document.getElementById('expenseAmount').value;
-                category = document.getElementById('expenseCategory').value;
-                payment = document.getElementById('expensePayment').value;
-                date = document.getElementById('expenseDate').value;
+                transactions.push(transaction);
             }
 
-            if (amount && category && payment && date) {
-                if (editIndex === "-1") {
-                    const newTransaction = { type, amount, category, payment, date };
-                    transactions.push(newTransaction);
-                } else {
-                    transactions[editIndex] = { type, amount, category, payment, date };
-                    document.getElementById('editIndex').value = "-1";
-                }
+            clearFormFields();
+            displayTransactions();
+        }
 
-                updateTransactionTable();
-                clearFormFields();
+        function editTransaction(index) {
+            const transaction = transactions[index];
+            if (transaction.type === 'Income') {
+                document.getElementById('incomeAmount').value = transaction.amount;
+                document.getElementById('incomeCategory').value = transaction.category;
+                document.getElementById('incomePayment').value = transaction.payment;
+                document.getElementById('incomeDate').value = transaction.date;
+                document.getElementById('incomeForm').style.display = 'block';
+                document.getElementById('editIndex').value = index;
             } else {
-                alert("Please fill in all fields.");
+                document.getElementById('expenseAmount').value = transaction.amount;
+                document.getElementById('expenseCategory').value = transaction.category;
+                document.getElementById('expensePayment').value = transaction.payment;
+                document.getElementById('expenseDate').value = transaction.date;
+                document.getElementById('expenseForm').style.display = 'block';
+                document.getElementById('editIndex').value = index;
             }
         }
 
-        function updateTransactionTable() {
-            const transactionTable = document.getElementById('transactionTable');
-            transactionTable.innerHTML = '';
+        function deleteTransaction(index) {
+            transactions.splice(index, 1);
+            displayTransactions();
+        }
+
+        function clearFormFields() {
+            document.getElementById('incomeAmount').value = '';
+            document.getElementById('incomeCategory').value = '';
+            document.getElementById('incomePayment').value = '';
+            document.getElementById('incomeDate').value = '';
+            document.getElementById('expenseAmount').value = '';
+            document.getElementById('expenseCategory').value = '';
+            document.getElementById('expensePayment').value = '';
+            document.getElementById('expenseDate').value = '';
+        }
+
+        function displayTransactions() {
+            const tableBody = document.getElementById('transactionTable');
+            tableBody.innerHTML = '';
 
             transactions.forEach((transaction, index) => {
                 const row = document.createElement('tr');
@@ -335,45 +367,9 @@
                         <button class="delete-btn" onclick="deleteTransaction(${index})">Delete</button>
                     </td>
                 `;
-                transactionTable.appendChild(row);
+                tableBody.appendChild(row);
             });
         }
-
-        function editTransaction(index) {
-            const transaction = transactions[index];
-            document.getElementById('editIndex').value = index;
-
-            if (transaction.type === 'Income') {
-                showForm('Income');
-                document.getElementById('incomeAmount').value = transaction.amount;
-                document.getElementById('incomeCategory').value = transaction.category;
-                document.getElementById('incomePayment').value = transaction.payment;
-                document.getElementById('incomeDate').value = transaction.date;
-            } else {
-                showForm('Expense');
-                document.getElementById('expenseAmount').value = transaction.amount;
-                document.getElementById('expenseCategory').value = transaction.category;
-                document.getElementById('expensePayment').value = transaction.payment;
-                document.getElementById('expenseDate').value = transaction.date;
-            }
-        }
-
-        function deleteTransaction(index) {
-            transactions.splice(index, 1);
-            updateTransactionTable();
-        }
-
-        function clearFormFields() {
-            document.getElementById('incomeAmount').value = '';
-            document.getElementById('incomeCategory').value = '';
-            document.getElementById('incomePayment').value = '';
-            document.getElementById('incomeDate').value = '';
-            document.getElementById('expenseAmount').value = '';
-            document.getElementById('expenseCategory').value = '';
-            document.getElementById('expensePayment').value = '';
-            document.getElementById('expenseDate').value = '';
-        }
     </script>
-
 </body>
 </html>
